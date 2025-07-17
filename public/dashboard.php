@@ -10,6 +10,7 @@ $userId = $_SESSION['user_id'];
 $current_folder_id = isset($_GET['folder']) ? (int)$_GET['folder'] : null;
 $items = $fileModel->getFilesByUserIdAndParent($userId, $current_folder_id);
 $breadcrumbs = $fileModel->getFolderPath($current_folder_id, $userId);
+$isImpersonating = isset($_SESSION['admin_id']);
 
 function is_previewable($mime_type) {
     $previewable_mimes = ['image/jpeg', 'image/png', 'image/gif', 'application/pdf', 'text/plain'];
@@ -34,7 +35,7 @@ function is_previewable($mime_type) {
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item"><button id="theme-toggler" class="btn btn-sm"><i class="fas fa-moon"></i></button></li>
-                    <?php if($_SESSION['user_role'] == 'admin'): ?><li class="nav-item"><a class="nav-link" href="admin.php">Painel Admin</a></li><?php endif; ?>
+                    <?php if($_SESSION['user_role'] == 'admin' && !$isImpersonating): ?><li class="nav-item"><a class="nav-link" href="admin.php">Painel Admin</a></li><?php endif; ?>
                     <li class="nav-item"><span class="navbar-text me-3">Bem-vindo, <?php echo $_SESSION['user_name']; ?>!</span></li>
                     <li class="nav-item"><a class="btn btn-danger" href="logout.php">Sair</a></li>
                 </ul>
@@ -43,6 +44,13 @@ function is_previewable($mime_type) {
     </nav>
 
     <div class="container mt-4">
+        <?php if ($isImpersonating): ?>
+            <div class="alert alert-warning d-flex justify-content-between align-items-center">
+                <span>Você está gerenciando os arquivos como <strong><?php echo $_SESSION['user_name']; ?></strong>.</span>
+                <a href="admin_revert_handler.php" class="btn btn-sm btn-outline-dark">Voltar ao Painel Admin</a>
+            </div>
+        <?php endif; ?>
+
         <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="dashboard.php">Início</a></li><?php foreach ($breadcrumbs as $b): ?><li class="breadcrumb-item"><a href="dashboard.php?folder=<?php echo $b->id; ?>"><?php echo htmlspecialchars($b->name); ?></a></li><?php endforeach; ?></ol></nav>
         <div class="d-flex justify-content-between align-items-center mb-4"><h2>Seus Arquivos</h2><div><button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newFolderModal"><i class="fas fa-folder-plus me-2"></i>Criar Pasta</button><button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadFileModal"><i class="fas fa-file-upload me-2"></i>Fazer Upload</button></div></div>
         <table class="table table-hover">
@@ -79,7 +87,7 @@ function is_previewable($mime_type) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Theme Toggler
+        // Lógica dos modais e tema...
         const themeToggler = document.getElementById('theme-toggler');
         const currentTheme = localStorage.getItem('theme');
         const sunIcon = '<i class="fas fa-sun"></i>';
@@ -103,7 +111,6 @@ function is_previewable($mime_type) {
             }
         });
 
-        // Modals Logic
         var renameModal = new bootstrap.Modal(document.getElementById('renameModal'));
         var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
         document.querySelectorAll('.renameBtn').forEach(b => b.addEventListener('click', e => {

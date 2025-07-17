@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Capivara Armazenamento</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="assets/style.css" rel="stylesheet">
 </head>
 <body>
@@ -21,8 +22,8 @@
                     <div class="card-body">
                         <form action="login_handler.php" method="POST">
                             <div class="mb-3">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" required>
+                                <label for="login" class="form-label">Email ou Nome de Usuário</label>
+                                <input type="text" class="form-control" id="login" name="login" required>
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Senha</label>

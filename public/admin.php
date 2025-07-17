@@ -33,7 +33,13 @@ $users = $userModel->getAllUsers();
     </nav>
 
     <div class="container mt-4">
-        <h2 class="mb-4">Gerenciamento de Usuários</h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Gerenciamento de Usuários</h2>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                <i class="fas fa-user-plus me-2"></i>Criar Usuário
+            </button>
+        </div>
+
         <table class="table table-striped">
             <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Criação</th><th>Ações</th></tr></thead>
             <tbody>
@@ -45,13 +51,32 @@ $users = $userModel->getAllUsers();
                     <td><span class="badge bg-<?php echo $user->role == 'admin' ? 'success' : 'secondary'; ?>"><?php echo $user->role; ?></span></td>
                     <td><?php echo date('d/m/Y', strtotime($user->created_at)); ?></td>
                     <td>
-                        <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                        <a href="admin_impersonate_handler.php?user_id=<?php echo $user->id; ?>" class="btn btn-sm btn-info" title="Gerenciar Arquivos"><i class="fas fa-folder-open"></i></a>
+                        <button class="btn btn-sm btn-warning" title="Editar (Não implementado)"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-danger" title="Excluir (Não implementado)"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
+    </div>
+
+    <!-- Modal Criar Usuário -->
+    <div class="modal fade" id="createUserModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="admin_create_user_handler.php" method="POST">
+                    <div class="modal-header"><h5 class="modal-title">Criar Novo Usuário</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                    <div class="modal-body">
+                        <div class="mb-3"><label for="username" class="form-label">Nome de Usuário</label><input type="text" class="form-control" name="username" required></div>
+                        <div class="mb-3"><label for="email" class="form-label">Email</label><input type="email" class="form-control" name="email" required></div>
+                        <div class="mb-3"><label for="password" class="form-label">Senha</label><input type="password" class="form-control" name="password" required></div>
+                        <div class="mb-3"><label for="role" class="form-label">Role</label><select class="form-select" name="role"><option value="user">User</option><option value="admin">Admin</option></select></div>
+                    </div>
+                    <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button><button type="submit" class="btn btn-primary">Criar</button></div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

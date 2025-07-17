@@ -8,14 +8,14 @@ class User {
         $this->db = new Database;
     }
 
-    // Encontrar usuário por email
-    public function findUserByEmail($email){
-        $this->db->query('SELECT * FROM users WHERE email = :email');
-        $this->db->bind(':email', $email);
+    // Encontrar usuário por email ou username
+    public function findUserByEmailOrUsername($login){
+        $this->db->query('SELECT * FROM users WHERE email = :login OR username = :login');
+        $this->db->bind(':login', $login);
 
         $row = $this->db->single();
 
-        // Checar se o email existe
+        // Checar se o usuário existe
         if($this->db->rowCount() > 0){
             return $row;
         } else {
@@ -23,13 +23,14 @@ class User {
         }
     }
 
-    // Registrar novo usuário
+    // Registrar novo usuário (com role)
     public function register($data){
-        $this->db->query('INSERT INTO users (username, email, password_hash) VALUES (:username, :email, :password)');
+        $this->db->query('INSERT INTO users (username, email, password_hash, role) VALUES (:username, :email, :password, :role)');
         // Bind dos valores
         $this->db->bind(':username', $data['username']);
         $this->db->bind(':email', $data['email']);
         $this->db->bind(':password', $data['password']);
+        $this->db->bind(':role', $data['role']);
 
         // Executar
         if($this->db->execute()){
@@ -43,5 +44,13 @@ class User {
     public function getAllUsers(){
         $this->db->query('SELECT id, username, email, role, created_at FROM users ORDER BY created_at DESC');
         return $this->db->resultSet();
+    }
+
+    // Encontrar usuário por ID
+    public function findUserById($id){
+        $this->db->query('SELECT * FROM users WHERE id = :id');
+        $this->db->bind(':id', $id);
+        $row = $this->db->single();
+        return $row;
     }
 }

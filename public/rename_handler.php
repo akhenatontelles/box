@@ -18,11 +18,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if (!empty($newName)) {
         $fileModel = new File();
-        if ($fileModel->renameFile($itemId, $userId, $newName)) {
-            // Sucesso
-        } else {
-            // Erro
-            error_log("Erro ao renomear o item $itemId.");
+        $item = $fileModel->getFileById($itemId, $userId);
+
+        if ($item) {
+            $finalNewName = $newName;
+
+            // Se for um arquivo, preservar a extensão
+            if ($item->type == 'file') {
+                $originalExtension = pathinfo($item->name, PATHINFO_EXTENSION);
+                $newNameBase = pathinfo($newName, PATHINFO_FILENAME); // Remove qualquer extensão do input do usuário
+
+                if (!empty($originalExtension)) {
+                    $finalNewName = $newNameBase . '.' . $originalExtension;
+                } else {
+                    $finalNewName = $newNameBase; // Caso o arquivo original não tenha extensão
+                }
+            }
+
+            if (!$fileModel->renameFile($itemId, $userId, $finalNewName)) {
+                error_log("Erro ao renomear o item $itemId.");
+            }
         }
     }
     header("Location: $redirectUrl");
